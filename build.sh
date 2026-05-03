@@ -1,59 +1,25 @@
 #!/bin/bash
+set -euo pipefail
 
 # PS4
-make clean
-make SYSTEM=PS4 FIRMWARE=9.00 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_900.bin
+PS4_FW_VERSIONS=(
+    "9.00" "9.03" "9.04"
+    "9.50" "9.51" "9.60"
+    "10.00" "10.01"
+    "10.50" "10.70" "10.71"
+    "11.00" "11.02"
+    "11.50" "11.52"
+    "12.00" "12.02"
+)
 
-make clean
-make SYSTEM=PS4 FIRMWARE=9.03 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_903.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=9.04 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_904.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=9.50 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_950.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=9.51 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_951.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=9.60 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_960.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=10.00 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1000.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=10.01 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1001.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=10.50 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1050.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=10.70 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1070.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=10.71 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1071.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=11.00 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1100.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=11.02 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1102.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=11.50 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1150.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=11.52 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1152.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=12.00 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1200.bin
-
-make clean
-make SYSTEM=PS4 FIRMWARE=12.02 EBOOT_VERSION=101 PAYLOAD=./stage2/stage2_1202.bin
+for fw in "${PS4_FW_VERSIONS[@]}"; do
+    fw_num="${fw/./}"
+    make clean
+    make SYSTEM=PS4 FIRMWARE="$fw" EBOOT_VERSION=1.01 PAYLOAD="./stage2/stage2_${fw_num}.bin"
+done
 
 make clean
 
 # PS5 (Unsupported :/)
-# make clean SYSTEM=PS5 FIRMWARE=0.00
+# make clean
 # make SYSTEM=PS5 FIRMWARE=0.00
