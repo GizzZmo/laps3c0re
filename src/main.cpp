@@ -1098,7 +1098,8 @@ int32_t double_free_reqs1()
     // more likely that we have another process claim the memory
 
     // RESTORE: double freed 0x80 block has been reclaimed with harmless data
-    err = make_aliased_evfs();
+    if (make_aliased_evfs() < 0)
+        printf_debug("Warning: failed to reclaim double freed 0x80 block with evfs!\n");
     // RESTORE: double freed 0x100 block has been reclaimed with harmless data
     // PANIC: 0x100 malloc zone pointers aliased
     err = make_aliased_pktopts();

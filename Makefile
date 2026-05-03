@@ -46,7 +46,13 @@ CPPFLAGS	= -Tdata=$(DATA) -Ttext=$(TEXT) -mno-gpopt -nostartfiles -nostdlib -nod
 # Target
 TARGET = $(OUT)/laps3c0re-$(SYSTEM)-$(FIRMWARE_DASH).elf
 
-all: compile save
+all: compile
+	@if command -v "$(SAVE_EXPLOIT)" >/dev/null 2>&1; then \
+		$(MAKE) save; \
+	else \
+		echo "Note: '$(SAVE_EXPLOIT)' not found. Skipping savegame creation."; \
+		echo "Install it and run 'make save' to generate the patched VMC0.card."; \
+	fi
 
 save:
 	$(SAVE_EXPLOIT) $(SAVE_IN) $(SAVE_OUT) $(TARGET)
