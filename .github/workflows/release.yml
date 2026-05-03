@@ -19,6 +19,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install git (container dependency)
+        run: |
+          set -e
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates
+
       - name: Clone mast1c0re SDK
         run: |
           git clone --depth=1 https://github.com/McCaulay/mast1c0re.git /opt/mast1c0re
