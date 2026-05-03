@@ -48,11 +48,9 @@ jobs:
         run: |
           set -eu
 
-          PS4_FW_VERSIONS="$(grep -Eo '"([0-9]{1,2}\.[0-9]{2})"' build.sh \
-            | tr -d '"' \
-            | awk '!seen[$0]++')"
+          grep -Eo '"([0-9]{1,2}\.[0-9]{2})"' build.sh | tr -d '"' | awk '!seen[$0]++' > /tmp/fw_versions.txt
 
-          if [ -z "$PS4_FW_VERSIONS" ]; then
+          if [ ! -s /tmp/fw_versions.txt ]; then
             echo "No PS4 firmware versions found in build.sh" >&2
             exit 1
           fi
@@ -62,9 +60,7 @@ jobs:
             make clean
             make SYSTEM=PS4 FIRMWARE="$fw" EBOOT_VERSION=1.01 MAST1C0RE=/opt/mast1c0re
             echo "::endgroup::"
-          done << EOF
-$PS4_FW_VERSIONS
-EOF
+          done < /tmp/fw_versions.txt
 
       - name: Upload ELF artifacts
         uses: actions/upload-artifact@v4
