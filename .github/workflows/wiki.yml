@@ -23,8 +23,52 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate Home wiki page
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
-          cat README.md > /tmp/Home.md
+          python3 << 'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          ref = os.environ["GITHUB_SHA"]
+          blob_base = f"https://github.com/{repo}/blob/{ref}/"
+          raw_base = f"https://raw.githubusercontent.com/{repo}/{ref}/"
+
+          text = Path("README.md").read_text(encoding="utf-8")
+
+          def is_relative(target):
+              return not (
+                  target.startswith("#")
+                  or target.startswith("http://")
+                  or target.startswith("https://")
+                  or target.startswith("mailto:")
+                  or target.startswith("/")
+              )
+
+          def rewrite_image(match):
+              alt_text = match.group(1)
+              target = match.group(2)
+              if not is_relative(target):
+                  return match.group(0)
+              target = target[2:] if target.startswith("./") else target
+              return f"![{alt_text}]({raw_base}{target})"
+
+          def rewrite_link(match):
+              label = match.group(1)
+              target = match.group(2)
+              if not is_relative(target):
+                  return match.group(0)
+              target = target[2:] if target.startswith("./") else target
+              return f"[{label}]({blob_base}{target})"
+
+          text = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', rewrite_image, text)
+          text = re.sub(r'(?<!!)\[([^\]]+)\]\(([^)]+)\)', rewrite_link, text)
+
+          Path("/tmp/Home.md").write_text(text, encoding="utf-8")
+          PY
 
       - name: Generate Supported Firmware wiki page
         run: |
