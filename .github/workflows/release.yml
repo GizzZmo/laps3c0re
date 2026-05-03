@@ -13,7 +13,7 @@ jobs:
     name: Build & Publish Release
     runs-on: ubuntu-latest
     container:
-      image: ps2dev/ps2dev:latest
+      image: ps2dev/ps2dev@sha256:REPLACE_WITH_APPROVED_PS2DEV_IMAGE_DIGEST
 
     steps:
       - name: Checkout
