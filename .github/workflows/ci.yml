@@ -11,7 +11,8 @@ jobs:
     name: Build (PS4)
     runs-on: ubuntu-latest
     container:
-      image: ps2dev/ps2dev:latest
+      # Pin to a specific immutable image digest; update intentionally when needed.
+      image: ps2dev/ps2dev@sha256:<approved-image-digest>
 
     steps:
       - name: Checkout
