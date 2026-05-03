@@ -13,7 +13,8 @@ jobs:
     name: Build & Publish Release
     runs-on: ubuntu-latest
     container:
-      image: ps2dev/ps2dev@sha256:REPLACE_WITH_APPROVED_PS2DEV_IMAGE_DIGEST
+      # Pinned to an immutable digest (ps2dev/ps2dev:latest @ 2026-04-25); update intentionally.
+      image: ps2dev/ps2dev@sha256:51abeb3ee8d7a6c227a8727544967632afbade7c12d0ddf42fdac671e5f5c5ac
 
     steps:
       - name: Checkout

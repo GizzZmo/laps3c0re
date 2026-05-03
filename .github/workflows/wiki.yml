@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: wiki-update
+  cancel-in-progress: false
+
 jobs:
   update-wiki:
     name: Update Wiki Pages
