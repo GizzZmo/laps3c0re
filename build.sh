@@ -1,4 +1,5 @@
 #!/bin/bash
+# Fail fast: exit on errors (-e), unset variables (-u), and pipeline failures (-o pipefail)
 set -euo pipefail
 
 # PS4
