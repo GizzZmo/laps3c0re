@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release
+    runs-on: ubuntu-latest
+    container:
+      image: ps2dev/ps2dev:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clone mast1c0re SDK
+        run: |
+          git clone --depth=1 https://github.com/McCaulay/mast1c0re.git /opt/mast1c0re
+
+      - name: Build all PS4 firmware variants
+        env:
+          MAST1C0RE: /opt/mast1c0re
+        run: |
+          set -euo pipefail
+          PS4_FW_VERSIONS=(
+            "9.00" "9.03" "9.04"
+            "9.50" "9.51" "9.60"
+            "10.00" "10.01"
+            "10.50" "10.70" "10.71"
+            "11.00" "11.02"
+            "11.50" "11.52"
+            "12.00" "12.02"
+          )
+          for fw in "${PS4_FW_VERSIONS[@]}"; do
+            echo "::group::Building PS4 $fw"
+            make clean
+            make SYSTEM=PS4 FIRMWARE="$fw" EBOOT_VERSION=1.01 MAST1C0RE=/opt/mast1c0re
+            echo "::endgroup::"
+          done
+
+      - name: Package ELF binaries per firmware
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          for dir in bin/PS4-*/; do
+            fw=$(basename "$dir")
+            zip -j "dist/${fw}.zip" "$dir"laps3c0re-*.elf
+          done
+          cp bin/NOTICE dist/NOTICE.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/NOTICE.txt
+          generate_release_notes: true
+          fail_on_unmatched_files: true
