@@ -34,15 +34,32 @@ jobs:
           MAST1C0RE: /opt/mast1c0re
         run: |
           set -euo pipefail
-          PS4_FW_VERSIONS=(
-            "9.00" "9.03" "9.04"
-            "9.50" "9.51" "9.60"
-            "10.00" "10.01"
-            "10.50" "10.70" "10.71"
-            "11.00" "11.02"
-            "11.50" "11.52"
-            "12.00" "12.02"
+
+          versions_source=""
+          for candidate in build.sh .github/workflows/ci.yml .github/workflows/ci.yaml; do
+            if [ -f "$candidate" ]; then
+              versions_source="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$versions_source" ]; then
+            echo "Unable to locate a shared firmware version source (build.sh or CI workflow)." >&2
+            exit 1
+          fi
+
+          mapfile -t PS4_FW_VERSIONS < <(
+            grep -oE '"[0-9]+\.[0-9]+"' "$versions_source" \
+              | tr -d '"' \
+              | awk '!seen[$0]++'
           )
+
+          if [ "${#PS4_FW_VERSIONS[@]}" -eq 0 ]; then
+            echo "No PS4 firmware versions found in $versions_source" >&2
+            exit 1
+          fi
+
+          echo "Using firmware versions from $versions_source: ${PS4_FW_VERSIONS[*]}"
           for fw in "${PS4_FW_VERSIONS[@]}"; do
             echo "::group::Building PS4 $fw"
             make clean
