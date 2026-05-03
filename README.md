@@ -1,4 +1,9 @@
 # Lapse + Mast1c0re = Laps3c0re!
+
+[![CI](https://github.com/GizzZmo/laps3c0re/actions/workflows/ci.yml/badge.svg)](https://github.com/GizzZmo/laps3c0re/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/GizzZmo/laps3c0re?label=release)](https://github.com/GizzZmo/laps3c0re/releases/latest)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+
 A port of [Lapse](https://github.com/kmeps4/PSFree/blob/main/lapse.mjs), which is a kernel exploit implementation by **@abc**, using [Mast1c0re](https://github.com/McCaulay/mast1c0re) by [@McCaulay](https://github.com/McCaulay) as an entry point.
 
 ![Laps3c0re cover by @aldostools](./laps3c0re-cover-by-aldostools.png)

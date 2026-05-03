@@ -1,0 +1,180 @@
+name: Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "build.sh"
+      - "Makefile"
+      - ".github/workflows/wiki.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wiki-update
+  cancel-in-progress: false
+
+jobs:
+  update-wiki:
+    name: Update Wiki Pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Home wiki page
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          python3 << 'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          ref = os.environ["GITHUB_SHA"]
+          blob_base = f"https://github.com/{repo}/blob/{ref}/"
+          raw_base = f"https://raw.githubusercontent.com/{repo}/{ref}/"
+
+          text = Path("README.md").read_text(encoding="utf-8")
+
+          def is_relative(target):
+              return not (
+                  target.startswith("#")
+                  or target.startswith("http://")
+                  or target.startswith("https://")
+                  or target.startswith("mailto:")
+                  or target.startswith("/")
+              )
+
+          def rewrite_image(match):
+              alt_text = match.group(1)
+              target = match.group(2)
+              if not is_relative(target):
+                  return match.group(0)
+              target = target[2:] if target.startswith("./") else target
+              return f"![{alt_text}]({raw_base}{target})"
+
+          def rewrite_link(match):
+              label = match.group(1)
+              target = match.group(2)
+              if not is_relative(target):
+                  return match.group(0)
+              target = target[2:] if target.startswith("./") else target
+              return f"[{label}]({blob_base}{target})"
+
+          text = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', rewrite_image, text)
+          text = re.sub(r'(?<!!)\[([^\]]+)\]\(([^)]+)\)', rewrite_link, text)
+
+          Path("/tmp/Home.md").write_text(text, encoding="utf-8")
+          PY
+
+      - name: Generate Supported Firmware wiki page
+        run: |
+          {
+            echo '# Supported Firmware Versions'
+            echo
+            echo 'This page is auto-generated from the repository source.'
+            echo
+            echo '## PS4'
+            echo
+            echo '| Firmware | Status |'
+            echo '|----------|--------|'
+
+            firmware_versions="$(
+              grep -Eo '[0-9]{1,2}\.[0-9]{2}' build.sh \
+                | sort -uV
+            )"
+
+            if [ -z "$firmware_versions" ]; then
+              echo 'Failed to extract firmware versions from build.sh' >&2
+              exit 1
+            fi
+
+            printf '%s\n' "$firmware_versions" | while IFS= read -r version; do
+              [ -n "$version" ] || continue
+              echo "| $version | ✅ Supported |"
+            done
+
+            echo '| 12.50 / 12.52 / 13.00 | ❌ Incompatible (Lapse exploit unsupported) |'
+            echo '| 13.02+ | ❌ Unsupported |'
+            echo
+            echo '## PS5'
+            echo
+            echo '| Firmware | Status |'
+            echo '|----------|--------|'
+            echo '| 10.01 | ❌ Mast1c0re nonfunctional on higher PS5 FWs |'
+            echo
+            echo '---'
+            echo '*Last updated: automatically on every push to `main`.*'
+          } > /tmp/Supported-Firmware.md
+
+      - name: Generate Build Instructions wiki page
+        run: |
+          cat > /tmp/Building-from-Source.md << 'EOF'
+          # Building from Source
+
+          This page describes how to build Laps3c0re from source.
+
+          ## Prerequisites
+
+          - A Linux system (or Docker)
+          - [`ps2dev/ps2dev`](https://hub.docker.com/r/ps2dev/ps2dev) Docker image (includes the `mips64r5900el-ps2-elf-g++` toolchain)
+          - [mast1c0re SDK](https://github.com/McCaulay/mast1c0re) cloned locally
+
+          ## Build Steps
+
+          ```bash
+          # Clone the mast1c0re SDK
+          git clone https://github.com/McCaulay/mast1c0re.git /opt/mast1c0re
+
+          # Clone this repository
+          git clone https://github.com/GizzZmo/laps3c0re.git
+          cd laps3c0re
+
+          # Build a specific firmware version
+          make SYSTEM=PS4 FIRMWARE=9.00 EBOOT_VERSION=1.01 MAST1C0RE=/opt/mast1c0re
+
+          # Or build all supported PS4 firmware versions at once
+          MAST1C0RE=/opt/mast1c0re bash build.sh
+          ```
+
+          ## Output
+
+          Built ELF files are placed under `bin/PS4-<fw>/laps3c0re-PS4-<fw>.elf`.
+
+          ## CI
+
+          Every push and pull request triggers an automated build via [GitHub Actions](../actions/workflows/ci.yml).
+          Pre-built binaries are available in the [Releases](../releases) section.
+
+          ## Makefile Variables
+
+          | Variable | Default | Description |
+          |----------|---------|-------------|
+          | `SYSTEM` | `PS4` | Target system (`PS4` or `PS5`) |
+          | `FIRMWARE` | `0.00` | Firmware version to target |
+          | `EBOOT_VERSION` | `1.01` | EBoot version |
+          | `MAST1C0RE` | *(required)* | Path to cloned mast1c0re repo |
+          | `PAYLOAD` | *(optional)* | Path to stage2 payload binary |
+          EOF
+
+      - name: Push pages to wiki
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.wiki.git" /tmp/wiki
+          cp /tmp/Home.md                  /tmp/wiki/Home.md
+          cp /tmp/Supported-Firmware.md    /tmp/wiki/Supported-Firmware.md
+          cp /tmp/Building-from-Source.md  /tmp/wiki/Building-from-Source.md
+          cd /tmp/wiki
+          git add .
+          git diff --cached --quiet || git commit -m "docs: auto-update wiki [skip ci]"
+          git push
