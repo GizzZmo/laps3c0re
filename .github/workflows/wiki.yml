@@ -53,7 +53,7 @@ jobs:
 
           | Firmware | Status |
           |----------|--------|
-          | 10.01 | ❌ Mast1c0re non-functional on higher PS5 FWs |
+          | 10.01 | ❌ Mast1c0re nonfunctional on higher PS5 FWs |
 
           ---
           *Last updated: automatically on every push to `main`.*
