@@ -44,6 +44,7 @@ jobs:
       - name: Build all PS4 firmware variants
         env:
           MAST1C0RE: /opt/mast1c0re
+        shell: bash
         run: |
           set -euo pipefail
           mapfile -t PS4_FW_VERSIONS < <(
