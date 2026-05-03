@@ -32,15 +32,15 @@ jobs:
           MAST1C0RE: /opt/mast1c0re
         run: |
           set -euo pipefail
-          PS4_FW_VERSIONS=(
-            "9.00" "9.03" "9.04"
-            "9.50" "9.51" "9.60"
-            "10.00" "10.01"
-            "10.50" "10.70" "10.71"
-            "11.00" "11.02"
-            "11.50" "11.52"
-            "12.00" "12.02"
+          mapfile -t PS4_FW_VERSIONS < <(
+            grep -Eo '"([0-9]{1,2}\.[0-9]{2})"' build.sh \
+              | tr -d '"' \
+              | awk '!seen[$0]++'
           )
+          if [ "${#PS4_FW_VERSIONS[@]}" -eq 0 ]; then
+            echo "No PS4 firmware versions found in build.sh" >&2
+            exit 1
+          fi
           for fw in "${PS4_FW_VERSIONS[@]}"; do
             echo "::group::Building PS4 $fw"
             make clean
