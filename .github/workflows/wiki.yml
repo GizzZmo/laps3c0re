@@ -7,6 +7,7 @@ on:
       - "README.md"
       - "build.sh"
       - "Makefile"
+      - "docs/**"
       - ".github/workflows/wiki.yml"
   workflow_dispatch:
 
@@ -164,6 +165,11 @@ jobs:
           | `PAYLOAD` | *(optional)* | Path to stage2 payload binary |
           EOF
 
+      - name: Copy docs pages for wiki
+        run: |
+          cp docs/how-to-guide.md /tmp/How-To-Guide.md
+          cp docs/faq.md          /tmp/FAQ.md
+
       - name: Push pages to wiki
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -174,6 +180,8 @@ jobs:
           cp /tmp/Home.md                  /tmp/wiki/Home.md
           cp /tmp/Supported-Firmware.md    /tmp/wiki/Supported-Firmware.md
           cp /tmp/Building-from-Source.md  /tmp/wiki/Building-from-Source.md
+          cp /tmp/How-To-Guide.md          /tmp/wiki/How-To-Guide.md
+          cp /tmp/FAQ.md                   /tmp/wiki/FAQ.md
           cd /tmp/wiki
           git add .
           git diff --cached --quiet || git commit -m "docs: auto-update wiki [skip ci]"
