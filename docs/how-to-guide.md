@@ -17,7 +17,7 @@ This guide walks you through the complete process of jailbreaking a supported PS
    - [Option A — USB ELF Loader](#option-a--usb-elf-loader)
    - [Option B — Network ELF Loader](#option-b--network-elf-loader)
    - [Option C — No Loader (save-only)](#option-c--no-loader-save-only)
-6. [Receive Debug Logs (Optional)](#6-receive-debug-logs-optional)
+6. [Capture Debug Logs (Optional)](#6-capture-debug-logs-optional)
 7. [Troubleshooting](#7-troubleshooting)
 
 ---
@@ -130,7 +130,7 @@ If you are using only the exploit save (without an ELF loader):
 
 ---
 
-## 6. Receive Debug Logs (Optional)
+## 6. Capture Debug Logs (Optional)
 
 To capture debug output from the exploit, run the following on a machine at IP `192.168.1.39`:
 

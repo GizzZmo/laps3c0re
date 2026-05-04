@@ -65,7 +65,7 @@ A port of [Lapse](https://github.com/kmeps4/PSFree/blob/main/lapse.mjs), which i
   - Open Okage, press the `start` button (which is in reality just the right side of the touch pad), then select "RESTORE GAME". Finally, follow the prompt to load Laps3c0re.
 - **With no loader:**
   - Open Okage, press the `start` button (which is in reality just the right side of the touch pad), then select "RESTORE GAME".
-- Advanced: To receive logs, run the command `ncat --udp --listen --keep-open --recv-only -p 9023` from a computer running at the IP address `192.168.1.39`. You'll need to have [NetCat](https://nmap.org/download) installed.
+- Advanced: To capture debug logs, run the command `ncat --udp --listen --keep-open --recv-only -p 9023` from a computer running at the IP address `192.168.1.39`. You'll need to have [NetCat](https://nmap.org/download) installed.
 
 ## FAQ
 
