@@ -1869,7 +1869,11 @@ void main()
         {
             cleanup();
             printf_debug("Something went wrong! Error: %d\n", err);
+#ifdef LIB_KERNEL_SCE_KERNEL_SEND_NOTIFICATION_REQUEST
             PS::notification("Exploit Failed! Please Reboot Your Console!");
+#else
+            printf_debug("Exploit Failed! Please Reboot Your Console!\n");
+#endif
             PS::Breakout::restore(); // Restore corruption
         }
         else

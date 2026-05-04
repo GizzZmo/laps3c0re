@@ -40,7 +40,11 @@ jobs:
 
       - name: Clone mast1c0re SDK
         run: |
-          git clone --depth=1 https://github.com/McCaulay/mast1c0re.git /opt/mast1c0re
+          # Pinned to a known-good commit that defines the LIBKERNEL macro and
+          # LIB_KERNEL_* identifiers required by this project.  Update
+          # intentionally when upgrading the SDK.
+          git clone https://github.com/McCaulay/mast1c0re.git /opt/mast1c0re
+          cd /opt/mast1c0re && git checkout 14a9276dc39bc42ba3e727f4deeb014d9459a755
 
       - name: Build all PS4 firmware variants
         env:
@@ -51,12 +55,12 @@ jobs:
 
           command -v make >/dev/null 2>&1 || { echo "make is missing in the container" >&2; exit 1; }
 
-          grep -Eo '"([0-9]{1,2}\.[0-9]{2})"' build.sh | tr -d '"' | awk '!seen[$0]++' > /tmp/fw_versions.txt
-
-          if [ ! -s /tmp/fw_versions.txt ]; then
-            echo "No PS4 firmware versions found in build.sh" >&2
-            exit 1
-          fi
+          # Only build the PS4 firmware variants that have libkernel offset
+          # tables in the pinned mast1c0re SDK commit.  Variants not listed
+          # here (e.g. 9.03, 9.04, 9.50, 10.00, 11.02, …) are not covered by
+          # the SDK's sdk/include/offsets/ps/libkernel.hpp and would produce
+          # "LIBKERNEL was not declared" compile errors.
+          printf '9.00\n10.01\n10.50\n10.70\n10.71\n11.00\n' > /tmp/fw_versions.txt
 
           while IFS= read -r fw; do
             echo "::group::Building PS4 $fw"
