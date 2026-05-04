@@ -3,6 +3,7 @@
 [![CI](https://github.com/GizzZmo/laps3c0re/actions/workflows/ci.yml/badge.svg)](https://github.com/GizzZmo/laps3c0re/actions/workflows/ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/GizzZmo/laps3c0re?label=release)](https://github.com/GizzZmo/laps3c0re/releases/latest)
 [![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+[![Wiki](https://img.shields.io/badge/docs-wiki-blue)](https://github.com/GizzZmo/laps3c0re/wiki)
 
 A port of [Lapse](https://github.com/kmeps4/PSFree/blob/main/lapse.mjs), which is a kernel exploit implementation by **@abc**, using [Mast1c0re](https://github.com/McCaulay/mast1c0re) by [@McCaulay](https://github.com/McCaulay) as an entry point.
 
@@ -31,6 +32,13 @@ A port of [Lapse](https://github.com/kmeps4/PSFree/blob/main/lapse.mjs), which i
 
 **PS5:**  
 - [ ] ~~10.01~~ Mast1c0re was confirmed to be non functional on higher PS5 FWs. Sadly, I don't own a PS5 to debug it.
+
+## Documentation
+
+- 📖 [How-To Guide](docs/how-to-guide.md) — step-by-step instructions for end users
+- ❓ [FAQ](docs/faq.md) — frequently asked questions
+- 🏗 [Building from Source](https://github.com/GizzZmo/laps3c0re/wiki/Building-from-Source) — compile Laps3c0re yourself
+- 📋 [Supported Firmware](https://github.com/GizzZmo/laps3c0re/wiki/Supported-Firmware) — full compatibility table
 
 ## Setup Guide
 
